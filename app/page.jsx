@@ -1,3 +1,6 @@
+import "@components/Feed";
+import Feed from "@components/Feed";
+
 const Home = () => {
   return (
     <section className="w-full flex-col flex-center">
@@ -14,6 +17,8 @@ const Home = () => {
         the modern world, helping people generate ideas and content with the
         latest artificial intelligence.
       </p>
+
+      <Feed />
     </section>
   );
 };

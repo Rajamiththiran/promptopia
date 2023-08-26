@@ -4,17 +4,18 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 const Nav = () => {
-  const isUserLoggedIn = true;
+  const { data: session } = useSession();
+
   const [toggleDropDown, setToggleDropDown] = useState(false);
 
   const [providers, setProviders] = useState(null);
 
   useEffect(() => {
-    const setProviders = async () => {
+    const setUpProviders = async () => {
       const response = await getProviders();
       setProviders(response);
     };
-    setProviders();
+    setUpProviders();
   }, []);
 
   return (
@@ -31,7 +32,7 @@ const Nav = () => {
 
       {/* Desktop Nav */}
       <div className="sm:flex hidden">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex gap-3 md:gap-5">
             <Link href="/create-prompt" className="black_btn">
               Create Post
@@ -68,7 +69,7 @@ const Nav = () => {
 
       {/* Mobile Nav */}
       <div className="sm:hidden flex relative">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex">
             <Image
               src="/assets/images/profile.png"

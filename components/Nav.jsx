@@ -10,6 +10,8 @@ const Nav = () => {
 
   const [providers, setProviders] = useState(null);
 
+  const user = session?.user;
+
   useEffect(() => {
     const setUpProviders = async () => {
       const response = await getProviders();
@@ -32,7 +34,7 @@ const Nav = () => {
 
       {/* Desktop Nav */}
       <div className="sm:flex hidden">
-        {session?.user ? (
+        {user ? (
           <div className="flex gap-3 md:gap-5">
             <Link href="/create-prompt" className="black_btn">
               Create Post
@@ -42,7 +44,7 @@ const Nav = () => {
             </button>
             <Link href="/profile">
               <Image
-                src="/assets/images/profile.png"
+                src={user.image}
                 width={37}
                 height={37}
                 className="rounded-full"
@@ -69,10 +71,10 @@ const Nav = () => {
 
       {/* Mobile Nav */}
       <div className="sm:hidden flex relative">
-        {session?.user ? (
+        {user ? (
           <div className="flex">
             <Image
-              src="/assets/images/profile.png"
+              src={user.image}
               width={37}
               height={37}
               className="rounded-full"

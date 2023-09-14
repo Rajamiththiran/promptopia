@@ -1,7 +1,6 @@
 import User from "@models/user";
 import { connectToDb } from "@utils/database";
 import NextAuth from "next-auth/next";
-
 import GoogleProvider from "next-auth/providers/google";
 
 const handler = NextAuth({
@@ -18,7 +17,13 @@ const handler = NextAuth({
         email: session.user.email,
       });
 
-      session.user.id = sessionUser._id.toString();
+      if (sessionUser) {
+        session.user.id = sessionUser._id.toString();
+      } else {
+        // Handle the case where no user is found
+        // You can set session.user.id to null or an empty string
+        session.user.id = null;
+      }
 
       return session;
     },
@@ -26,12 +31,12 @@ const handler = NextAuth({
     async signIn({ profile }) {
       try {
         await connectToDb();
-        // check is user exist(if it is)
+        // Check if the user exists
         const userExist = await User.findOne({
           email: profile.email,
         });
 
-        // check is user exist(if it is not)
+        // If the user does not exist, create a new user
         if (!userExist) {
           await User.create({
             email: profile.email,
@@ -39,9 +44,11 @@ const handler = NextAuth({
             image: profile.picture,
           });
         }
+
         return true;
       } catch (error) {
-        console.log(error);
+        console.error("Error in signIn callback:", error.message);
+        console.error("Stack Trace:", error.stack);
         return false;
       }
     },

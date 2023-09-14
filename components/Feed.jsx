@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
+import { data } from "autoprefixer";
 import PromptCard from "./PromptCard";
 
 const PromptCardList = ({ data, handleTagClick }) => {
@@ -34,6 +35,7 @@ const Feed = () => {
   }, []);
 
   const handleSearchChange = (e) => {};
+  console.log("summa", allPosts);
 
   return (
     <section className="feed">

@@ -1,7 +1,8 @@
-import User from "@models/user";
-import { connectToDb } from "@utils/database";
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+
+import User from "@models/user";
+import { connectToDB } from "@utils/database";
 
 const handler = NextAuth({
   providers: [
@@ -10,34 +11,23 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-
   callbacks: {
     async session({ session }) {
-      const sessionUser = await User.findOne({
-        email: session.user.email,
-      });
-
-      if (sessionUser) {
-        session.user.id = sessionUser._id.toString();
-      } else {
-        // Handle the case where no user is found
-        // You can set session.user.id to null or an empty string
-        session.user.id = null;
-      }
+      // store the user id from MongoDB to session
+      const sessionUser = await User.findOne({ email: session.user.email });
+      session.user.id = sessionUser._id.toString();
 
       return session;
     },
-
-    async signIn({ profile }) {
+    async signIn({ account, profile, user, credentials }) {
       try {
-        await connectToDb();
-        // Check if the user exists
-        const userExist = await User.findOne({
-          email: profile.email,
-        });
+        await connectToDB();
 
-        // If the user does not exist, create a new user
-        if (!userExist) {
+        // check if user already exists
+        const userExists = await User.findOne({ email: profile.email });
+
+        // if not, create a new document and save user in MongoDB
+        if (!userExists) {
           await User.create({
             email: profile.email,
             username: profile.name.replace(" ", "").toLowerCase(),
@@ -47,8 +37,7 @@ const handler = NextAuth({
 
         return true;
       } catch (error) {
-        console.error("Error in signIn callback:", error.message);
-        console.error("Stack Trace:", error.stack);
+        console.log("Error checking if user exists: ", error.message);
         return false;
       }
     },
